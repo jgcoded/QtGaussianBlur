@@ -9,11 +9,17 @@ class GaussianBlur
 public:
     GaussianBlur();
 
-    QImage* BlurImage(QImage* in, float radius);
+    QImage BlurImage(const QImage& in, float radius);
 
     static float GaussFunc(float x, float y, float sigma);
 
     float** CreateConvolutionMatrix(float radius, float sigma);
+
+private:
+
+    int ReflectIndex(int x, int length);
+
+    void DestroyConvolutionMatrix(float** cMatrix);
 };
 
 #endif // GAUSSIANBLUR_H

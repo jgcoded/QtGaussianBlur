@@ -1,13 +1,58 @@
 #include "gaussianblur.h"
+#include "qcolor.h"
 #include <math.h>
 
 GaussianBlur::GaussianBlur()
 {
 }
 
-QImage *GaussianBlur::BlurImage(QImage *in, float radius)
+QImage GaussianBlur::BlurImage(const QImage& in, float radius)
 {
-    return NULL;
+
+    if(in.isNull())
+        return NULL;
+
+    QImage image(in.size(), in.format());
+
+    float **cMatrix = CreateConvolutionMatrix(radius, 0.84089642);
+    int matrixSize = radius * 2 + 1;
+    int halfMatrixSize = matrixSize / 2;
+
+    float sumRed = 0;
+    float sumBlue = 0;
+    float sumGreen = 0;
+    float x1, y1;
+    for (int x = 0; x < in.width(); ++x)
+    {
+        for (int y = 0; j < in.height(); ++y)
+        {
+
+            for (int kx = -halfMatrixSize; kx <= halfMatrixSize; ++kx)
+            {
+                for (int ky = -halfMatrixSize; ky <= halfMatrixSize; ++ky)
+                {
+                    x1 = ReflectIndex(x - kx, in.width());
+                    y1 = ReflectIndex(y - ky, in.height());
+
+                    QColor color(in.pixel(x1, y1));
+
+                    sumRed = sumRed + (float)color.redF() * cMatrix[kx][ky];
+                    sumBlue = sumBlue + (float)color.blueF() * cMatrix[kx][ky];
+                    sumGreen = sumGreen + (float)color.greenF() * cMatrix[kx][ky];
+                }
+            }
+            QColor finalPixelColor(sumRed, sumGreen, sumBlue);
+            image.setPixel(x, y, finalPixelColor.rgb());
+
+            sumRed = 0;
+            sumBlue = 0;
+            sumGreen = 0;
+
+        }
+    }
+
+
+    return image;
 }
 
 float GaussianBlur::GaussFunc(float x, float y, float sigma)
@@ -35,9 +80,9 @@ float **GaussianBlur::CreateConvolutionMatrix(float radius, float sigma)
     sum = 0.0f;
     i = j = 0;
     // fill in the matrix
-    for (x = -halfMatrixSize; x < halfMatrixSize + 1; ++x)
+    for (x = -halfMatrixSize; x <= halfMatrixSize; ++x)
     {
-        for(y = -halfMatrixSize; y < halfMatrixSize + 1; ++y)
+        for(y = -halfMatrixSize; y <= halfMatrixSize; ++y)
         {
             cMatrix[i][j] = GaussFunc(x, y, sigma);
             sum += cMatrix[i][j];
@@ -54,4 +99,22 @@ float **GaussianBlur::CreateConvolutionMatrix(float radius, float sigma)
             cMatrix[i][j] /= sum;
 
     return cMatrix;
+}
+
+int GaussianBlur::ReflectIndex(int x, int length)
+{
+    if (x < 0)
+        return -x - 1;
+    else if(x >= length)
+        return 2*length - x - 1;
+
+    return x;
+}
+
+void GaussianBlur::DestroyConvolutionMatrix(float **cMatrix, int radius)
+{
+    for (int i = 0; i < radius * 2 + 1; ++i)
+        free(cMatrix[i]);
+
+    free(cMatrix);
 }

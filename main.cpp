@@ -8,16 +8,16 @@ void test()
 
     float **kernel = blur.CreateConvolutionMatrix(3, 0.84089642);
 
-    for(int i = 0; i < 7; ++i)
+    for (int i = 0; i < 7; ++i)
     {
-        for(int j = 0; j < 7; ++j)
+        for (int j = 0; j < 7; ++j)
         {
             printf("%f\t", kernel[i][j]);
         }
         printf("\n");
     }
 
-    for(int i = 0; i < 7; ++i)
+    for (int i = 0; i < 7; ++i)
         free(kernel[i]);
 
     free(kernel);
