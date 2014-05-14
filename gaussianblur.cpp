@@ -2,8 +2,10 @@
 #include "qcolor.h"
 #include <math.h>
 
-GaussianBlur::GaussianBlur()
+GaussianBlur::GaussianBlur(int blurRadius, float sigma)
 {
+    this->blurRadius = blurRadius;
+    cMatrix = CreateConvolutionMatrix(blurRadius, sigma);
 }
 
 QImage GaussianBlur::BlurImage(const QImage& in, float radius)
@@ -14,7 +16,6 @@ QImage GaussianBlur::BlurImage(const QImage& in, float radius)
 
     QImage image(in.size(), in.format());
 
-    float **cMatrix = CreateConvolutionMatrix(radius, 0.84089642);
     int matrixSize = radius * 2 + 1;
     int halfMatrixSize = matrixSize / 2;
 
@@ -52,7 +53,6 @@ QImage GaussianBlur::BlurImage(const QImage& in, float radius)
         }
     }
 
-    DestroyConvolutionMatrix(cMatrix, radius);
     return image;
 }
 
@@ -119,3 +119,32 @@ void GaussianBlur::DestroyConvolutionMatrix(float **cMatrix, int radius)
 
     free(cMatrix);
 }
+float GaussianBlur::getSigma() const
+{
+    return sigma;
+}
+
+void GaussianBlur::setSigma(float value)
+{
+    sigma = value;
+    DestroyConvolutionMatrix(cMatrix, blurRadius);
+    cMatrix = CreateConvolutionMatrix(blurRadius, sigma);
+}
+
+int GaussianBlur::getBlurRadius() const
+{
+    return blurRadius;
+}
+
+void GaussianBlur::setBlurRadius(int value)
+{
+    DestroyConvolutionMatrix(cMatrix, blurRadius);
+    blurRadius = value;
+    cMatrix = CreateConvolutionMatrix(blurRadius, sigma);
+}
+
+GaussianBlur::~GaussianBlur()
+{
+    DestroyConvolutionMatrix(cMatrix, blurRadius);
+}
+
