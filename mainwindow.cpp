@@ -3,13 +3,13 @@
 #include <qpalette.h>
 #include <qfiledialog.h>
 #include <qlogging.h>
+#include "gaussianblur.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    ui->imageLabel->setBackgroundRole(QPalette::Base);
 
     imageLoader = new ImageLoader;
 }
@@ -33,4 +33,13 @@ MainWindow::~MainWindow()
 {
     delete ui;
     delete imageLoader;
+}
+
+void MainWindow::on_actionProcess_Image_triggered()
+{
+    GaussianBlur blur;
+
+    QImage img = blur.BlurImage(imageLoader->GetImage(), 3);
+
+    ui->blurLabel->setPixmap(QPixmap::fromImage(img));
 }

@@ -18,6 +18,8 @@ public:
 private slots:
     void on_actionLoad_Image_triggered();
 
+    void on_actionProcess_Image_triggered();
+
 private:
     Ui::MainWindow *ui;
     ImageLoader *imageLoader;

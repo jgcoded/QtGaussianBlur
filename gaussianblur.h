@@ -19,7 +19,7 @@ private:
 
     int ReflectIndex(int x, int length);
 
-    void DestroyConvolutionMatrix(float** cMatrix);
+    void DestroyConvolutionMatrix(float **cMatrix, int radius);
 };
 
 #endif // GAUSSIANBLUR_H

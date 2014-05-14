@@ -10,7 +10,7 @@ QImage GaussianBlur::BlurImage(const QImage& in, float radius)
 {
 
     if(in.isNull())
-        return NULL;
+        return QImage();
 
     QImage image(in.size(), in.format());
 
@@ -24,7 +24,7 @@ QImage GaussianBlur::BlurImage(const QImage& in, float radius)
     float x1, y1;
     for (int x = 0; x < in.width(); ++x)
     {
-        for (int y = 0; j < in.height(); ++y)
+        for (int y = 0; y < in.height(); ++y)
         {
 
             for (int kx = -halfMatrixSize; kx <= halfMatrixSize; ++kx)
@@ -36,13 +36,14 @@ QImage GaussianBlur::BlurImage(const QImage& in, float radius)
 
                     QColor color(in.pixel(x1, y1));
 
-                    sumRed = sumRed + (float)color.redF() * cMatrix[kx][ky];
-                    sumBlue = sumBlue + (float)color.blueF() * cMatrix[kx][ky];
-                    sumGreen = sumGreen + (float)color.greenF() * cMatrix[kx][ky];
+                    sumRed = sumRed + (float)color.red() * cMatrix[kx + halfMatrixSize][ky + halfMatrixSize];
+                    sumBlue = sumBlue + (float)color.blue() * cMatrix[kx + halfMatrixSize][ky + halfMatrixSize];
+                    sumGreen = sumGreen + (float)color.green() * cMatrix[kx + halfMatrixSize][ky + halfMatrixSize];
                 }
             }
             QColor finalPixelColor(sumRed, sumGreen, sumBlue);
-            image.setPixel(x, y, finalPixelColor.rgb());
+
+            image.setPixel(x, y, finalPixelColor.rgba());
 
             sumRed = 0;
             sumBlue = 0;
@@ -51,7 +52,7 @@ QImage GaussianBlur::BlurImage(const QImage& in, float radius)
         }
     }
 
-
+    DestroyConvolutionMatrix(cMatrix, radius);
     return image;
 }
 
