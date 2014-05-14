@@ -14,9 +14,11 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    imageloader.cpp
+    imageloader.cpp \
+    gaussianblur.cpp
 
 HEADERS  += mainwindow.h \
-    imageloader.h
+    imageloader.h \
+    gaussianblur.h
 
 FORMS    += mainwindow.ui
