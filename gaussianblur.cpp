@@ -1,14 +1,13 @@
 #include "gaussianblur.h"
-#include "qcolor.h"
-#include <math.h>
 
 GaussianBlur::GaussianBlur(int blurRadius, float sigma)
 {
     this->blurRadius = blurRadius;
+    this->sigma = sigma;
     cMatrix = CreateConvolutionMatrix(blurRadius, sigma);
 }
 
-QImage GaussianBlur::BlurImage(const QImage& in, float radius)
+QImage GaussianBlur::BlurImage(const QImage& in)
 {
 
     if(in.isNull())
@@ -16,12 +15,13 @@ QImage GaussianBlur::BlurImage(const QImage& in, float radius)
 
     QImage image(in.size(), in.format());
 
-    int matrixSize = radius * 2 + 1;
+    int matrixSize = blurRadius * 2 + 1;
     int halfMatrixSize = matrixSize / 2;
 
     float sumRed = 0;
     float sumBlue = 0;
     float sumGreen = 0;
+    float matrixValue = 0;
     float x1, y1;
     for (int x = 0; x < in.width(); ++x)
     {
@@ -36,20 +36,20 @@ QImage GaussianBlur::BlurImage(const QImage& in, float radius)
                     y1 = ReflectIndex(y - ky, in.height());
 
                     QColor color(in.pixel(x1, y1));
+                    matrixValue = cMatrix[kx + halfMatrixSize][ky + halfMatrixSize];
 
-                    sumRed = sumRed + (float)color.red() * cMatrix[kx + halfMatrixSize][ky + halfMatrixSize];
-                    sumBlue = sumBlue + (float)color.blue() * cMatrix[kx + halfMatrixSize][ky + halfMatrixSize];
-                    sumGreen = sumGreen + (float)color.green() * cMatrix[kx + halfMatrixSize][ky + halfMatrixSize];
+                    sumRed += color.red() * matrixValue;
+                    sumBlue += color.blue() * matrixValue;
+                    sumGreen += color.green() * matrixValue;
                 }
             }
-            QColor finalPixelColor(sumRed, sumGreen, sumBlue);
 
-            image.setPixel(x, y, finalPixelColor.rgba());
+            QRgb finalColor = qRgb(sumRed, sumGreen, sumBlue);
+            image.setPixel(x, y, finalColor);
 
             sumRed = 0;
             sumBlue = 0;
             sumGreen = 0;
-
         }
     }
 
@@ -68,10 +68,11 @@ float **GaussianBlur::CreateConvolutionMatrix(float radius, float sigma)
     float sum;
     int matrixSize;
     int halfMatrixSize;
-    float **cMatrix;
+    float **cMatrix = NULL;
 
     matrixSize = radius * 2 + 1; // need an odd value in order to have a center
     halfMatrixSize = matrixSize / 2;
+
     // allocate memory
     cMatrix = (float**)malloc(sizeof(float*) * matrixSize);
 
@@ -145,6 +146,6 @@ void GaussianBlur::setBlurRadius(int value)
 
 GaussianBlur::~GaussianBlur()
 {
-    DestroyConvolutionMatrix(cMatrix, blurRadius);
+    if (cMatrix != NULL)
+        DestroyConvolutionMatrix(cMatrix, blurRadius);
 }
-

@@ -1,6 +1,9 @@
 #ifndef GAUSSIANBLUR_H
 #define GAUSSIANBLUR_H
 
+#include <math.h>
+#include <cstdlib> // for realloc
+#include "qcolor.h"
 #include "qimage.h"
 
 class GaussianBlur
@@ -9,7 +12,7 @@ class GaussianBlur
 public:
     GaussianBlur(int blurRadius, float sigma);
 
-    QImage BlurImage(const QImage& in, float radius);
+    QImage BlurImage(const QImage& in);
 
     static float GaussFunc(float x, float y, float sigma);
 
