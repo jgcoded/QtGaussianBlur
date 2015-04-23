@@ -1,10 +1,12 @@
 #ifndef GAUSSIANBLUR_H
 #define GAUSSIANBLUR_H
 
-#include <math.h>
-#include <cstdlib> // for realloc
+#include <vector>
+
 #include "qcolor.h"
 #include "qimage.h"
+
+using std::vector;
 
 class GaussianBlur
 {
@@ -14,9 +16,7 @@ public:
 
     QImage BlurImage(const QImage& in);
 
-    static float GaussFunc(float x, float y, float sigma);
-
-    static float** CreateConvolutionMatrix(float radius, float sigma);
+    float GaussFunc(float x);
 
     int getBlurRadius() const;
     void setBlurRadius(int value);
@@ -28,13 +28,13 @@ public:
 
 private:
 
-    float **cMatrix;
+    vector<float> mConvolutionMatrix;
+
     int ReflectIndex(int x, int length);
+    void CreateConvolutionMatrix();
 
-    void DestroyConvolutionMatrix(float **cMatrix, int radius);
-
-    int blurRadius;
-    float sigma;
+    int mBlurRadius;
+    float mSigma;
 };
 
 #endif // GAUSSIANBLUR_H
